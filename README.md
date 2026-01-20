@@ -18,7 +18,7 @@ Os jogadores se revezam em turnos, digitando uma letra por vez para tentar desco
 Quando um jogador erra uma letra, uma penalidade da forca é aplicada, sendo compartilhada entre todos os jogadores.  
 O jogo termina quando a palavra é completamente revelada ou quando o número máximo de erros é atingido.
 
-## Instruções de Como Jogar
+## Instruções de Como execultar o projeto
 
 - O jogo da forca é jogado por três jogadores, conectados simultaneamente ao servidor.
 - Antes de iniciar a partida, o servidor deve estar em execução.
@@ -34,7 +34,7 @@ O jogo termina quando a palavra é completamente revelada ou quando o número m�
   - O número máximo de erros é atingido (derrota).
 - Vence o jogador que acertar a última letra da palavra.
 
-##  Instruções de Como Jogar
+##  Instruções de como jogar
 
 1. Inicie o servidor executando a classe TCPServer.
 2. Em três terminais diferentes, execute a classe TCPClient para que os jogadores se conectem.

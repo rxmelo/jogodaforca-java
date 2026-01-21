@@ -9,127 +9,153 @@ import java.time.format.DateTimeFormatter;
 public class TCPServer {
 
     static String penalidade(int consequencias, String palpite) {
-    	//mensagem de erro
-        if (consequencias == 1)
-            return "Não possui a letra: " + palpite + " 0 Cabeça desenhada";
-        if (consequencias == 2)
-            return "Não possui a letra: " + palpite + " . Pescoço desenhado";
-        if (consequencias == 3)
-            return "Não possui a letra: " + palpite + " D Tronco desenhado";
-        if (consequencias == 4)
-            return "Não possui a letra: " + palpite + " // Perna esquerda";
-        if (consequencias == 5)
-            return "Não possui a letra: " + palpite + " \\  Perna direita";
-        if (consequencias == 6)
-            return "Não possui a letra: " + palpite + " // Braço esquerdo";
-        return "estão livres da forca por enqunto";
+        if (consequencias == 1) return "Não possui a letra: " + palpite + " 0 Cabeça desenhada";
+        if (consequencias == 2) return "Não possui a letra: " + palpite + " . Pescoço desenhado";
+        if (consequencias == 3) return "Não possui a letra: " + palpite + " D Tronco desenhado";
+        if (consequencias == 4) return "Não possui a letra: " + palpite + " // Perna esquerda";
+        if (consequencias == 5) return "Não possui a letra: " + palpite + " \\  Perna direita";
+        if (consequencias == 6) return "Não possui a letra: " + palpite + " // Braço esquerdo";
+        return "estão livres da forca por enquanto";
     }
 
     public static void main(String[] args) throws Exception {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
         ServerSocket serverSocket = new ServerSocket(6789);
         System.out.println("Servidor da Forca iniciado...");
 
-        // esquema de controle dos jogadores
         Socket[] jogadores = new Socket[3];
         BufferedReader[] entradas = new BufferedReader[3];
         PrintWriter[] saidas = new PrintWriter[3];
-       
-        // conectando com os tres jogadores
+
         for (int i = 0; i < 3; i++) {
-
-            System.out.println("[" + dtf.format(LocalDateTime.now()) + "] "
-                    + "Aguardando conexão do jogador " + (i + 1));
-
+            System.out.println("[" + dtf.format(LocalDateTime.now()) + "] Aguardando jogador " + (i + 1));
             jogadores[i] = serverSocket.accept();
-
             entradas[i] = new BufferedReader(new InputStreamReader(jogadores[i].getInputStream()));
-
             saidas[i] = new PrintWriter(jogadores[i].getOutputStream(), true);
-
-            System.out.println("Jogador " + (i + 1) + " conectado");
-
             saidas[i].println("Você é o jogador " + (i + 1));
         }
 
-        // variaveis do jogo
-        jogo jogo = new jogo();
-        String palavra = jogo.palavra();
-        int consequencias = 0;
-        boolean fimDeJogo = false;
-        int jogadorAtual = 0;
+        int cont = 1;
+        boolean encerrarServidor = false;
 
-        // jogo iniciado
+        // boas vindas e regras
         for (PrintWriter out : saidas) {
             out.println("Bem vindo ao jogo da forca! o tema será animações!");
-            //regra 1
-            out.println(" Regra:1-> Cada jogador deve esperar a sua vez de chutar uma letra da palavra. Só pode erra o chute até 7 vezes");
-            //regra 2
-            out.println(" Regra:2-> Os jogadores terão as penalidades compartilhadas. "
-            		+ "Para o jogo ser emocionante apenas o jogador que errou vai saber qual parte foi desnhada");
-            //regra 3
-            out.println(" Regra:3-> A palavra atual tem: "+ palavra.length()+" letras. Ganha quem acertar a ultima letra da palavra");
+            out.println("Regra 1 -> Cada jogador deve esperar a sua vez");
+            out.println("Regra 2 -> Penalidades compartilhadas");
+            out.println("Regra 3 -> Só o jogador que errou sabe qual foi a parte desnhada");
+            out.println("Epere todos os jogadores comfirmarem sim");
         }
-        // loop de turnos
-        while (!fimDeJogo) {
-        	// inicialização dos meios de envio e entrada de dados: out-> sai in-> entra
-            PrintWriter out = saidas[jogadorAtual];
-            BufferedReader in = entradas[jogadorAtual];
-
-            out.println("Sua vez! jogador: "+ (jogadorAtual+1) + " Digite uma letra:");
-            String palpite = in.readLine();
-
-            if (!jogo.verificar(palpite, palavra)) {
-                consequencias++;
-                
-                out.println(penalidade(consequencias, palpite));
-                
-            } else {
-            	// mensagem para dizer qual é o jogador do proximo turno
-            	if(jogadorAtual == 2) out.println("Letra correta! Agora o jogador: "+(jogadorAtual-1) +" Vai responder");
-            	else out.println("Letra correta! Agora o jogador: "+(jogadorAtual+2) +" Vai responder");
-            	
+        
+        // confirmação inicio
+        boolean[] confirmou = new boolean[3];
+        int confirmados = 0;
+        
+        while (confirmados < 3) {
+            for (int i = 0; i < 3; i++) {
+                if (!confirmou[i]) {
+                    saidas[i].println("Digite 'sim' para confirmar o inicio do jogo; ou 'nao' caso não esteja pronto:");
+                    String comf = entradas[i].readLine();
+                    if (comf != null && comf.equalsIgnoreCase("sim")) {
+                        confirmou[i] = true;
+                        confirmados++;
+                        saidas[i].println("Confirmado! Aguarde os outros jogadores...");
+                    }
+                }
             }
+        }
 
-            String estado = jogo.palavra_pos_resposta(palavra);
+        //loops de rodadas 
+        while (!encerrarServidor) {
 
-            // Envia o estado da palavra para todos
+            // reset de rodadas
+            jogo jogo = new jogo();
+            String palavra = jogo.palavra();
+            int consequencias = 0;
+            boolean fimDeJogo = false;
+            int jogadorAtual = 0;
+            // aviso de novas rodadas
+            if (cont > 1) {
+                for (PrintWriter s : saidas) {
+                    s.println("Nova rodada!");
+                }
+            }
+            // envio da regra 3
             for (PrintWriter s : saidas) {
-                s.println("Palavra: " + estado);
+                s.println("Regra 4 -> A palavra tem: " + palavra.length() + " letras");
             }
 
-            // Verificar se os jogadores erraram acima do limite
-            if (consequencias >= 7) {
-                for (PrintWriter s : saidas) {
-                    s.println("Não possui a letra: " + palpite + " \\ Braço direito; perderam o jogo");
+            // loop de turnos
+            while (!fimDeJogo) {
+
+                PrintWriter out = saidas[jogadorAtual];
+                BufferedReader in = entradas[jogadorAtual];
+
+                out.println("Sua vez! jogador: " + (jogadorAtual + 1) + " Digite uma letra:");
+                String palpite = in.readLine();
+
+                if (!jogo.verificar(palpite, palavra)) {
+                    consequencias++;
+                    out.println(penalidade(consequencias, palpite));
+                } else {
+                    out.println("Letra correta!");
                 }
-                
-                fimDeJogo = true;
-                
-            }
-            // verifica se a palavra foi completa
-            fimDeJogo = jogo.jogo_ganho(estado, palavra);
-            
-            if (fimDeJogo == true) {
+
+                String estado = jogo.palavra_pos_resposta(palavra);
                 for (PrintWriter s : saidas) {
-                    s.println("palavra completa! jogador: "+ (jogadorAtual+1) +" ganhou");
+                    s.println("Palavra: " + estado);
                 }
-                
-                fimDeJogo = true;
+
+                if (consequencias >= 7) {
+                    for (PrintWriter s : saidas) {
+                        s.println("Perderam o jogo!");
+                    }
+                    fimDeJogo = true; 
+                }
+
+                if (jogo.jogo_ganho(estado, palavra)) {
+                    for (PrintWriter s : saidas) {
+                        s.println("Palavra completa! Jogador " + (jogadorAtual + 1) + " ganhou!");
+                    }
+                    fimDeJogo = true;
+                }
+
+                jogadorAtual++;
+                if (jogadorAtual > 2) jogadorAtual = 0;
             }
 
-            jogadorAtual++;
-            
-            if (jogadorAtual > 2) jogadorAtual = 0;
-            
+            // comfirmação de nova rodada
+            confirmou = new boolean[3];
+            confirmados = 0;
+            boolean alguemDisseNao = false;
+
+            while (confirmados < 3) {
+                for (int i = 0; i < 3; i++) {
+                    if (!confirmou[i]) {
+                        saidas[i].println("Deseja iniciar um novo jogo? (sim/nao)[AVISO: caso digite não o servidor será encerrado]");
+                        String r = entradas[i].readLine();
+
+                        if (r != null && r.equalsIgnoreCase("sim")) {
+                            confirmou[i] = true;
+                            confirmados++;
+                        } else {
+                            alguemDisseNao = true;
+                            break;
+                        }
+                    }
+                }
+                if (alguemDisseNao) break;
+            }
+
+            if (alguemDisseNao) {
+                encerrarServidor = true;
+            } else {
+                cont++;
+            }
         }
-        // Fim do jogo
-        for (int i = 0; i < 3; i++) {
-            jogadores[i].close();
-        }
-        // fecha o servidor sem aparecer mensagem de erro na tela 
+
+        for (Socket j : jogadores) j.close();
         serverSocket.close();
         System.out.println("Servidor encerrado.");
     }

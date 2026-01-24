@@ -75,15 +75,17 @@ public class TCPServer {
             int consequencias = 0;
             boolean fimDeJogo = false;
             int jogadorAtual = 0;
+            int espere = 3;
             // aviso de novas rodadas
             if (cont > 1) {
                 for (PrintWriter s : saidas) {
                     s.println("Nova rodada!");
                 }
             }
-            // envio da regra 3
+            // envio da regra 4
             for (PrintWriter s : saidas) {
                 s.println("Regra 4 -> A palavra tem: " + palavra.length() + " letras");
+                s.println("palavra: "+ jogo.palavra_pos_resposta(palavra));
             }
 
             // loop de turnos
@@ -97,9 +99,12 @@ public class TCPServer {
 
                 if (!jogo.verificar(palpite, palavra)) {
                     consequencias++;
+                    out.println("agora espere o jogador: "+(espere)+" finalizar seu turno!");
                     out.println(penalidade(consequencias, palpite));
                 } else {
                     out.println("Letra correta!");
+                    
+                    out.println("agora espere o jogador: "+(espere)+" finalizar seu turno!");
                 }
 
                 String estado = jogo.palavra_pos_resposta(palavra);
@@ -114,15 +119,21 @@ public class TCPServer {
                     fimDeJogo = true; 
                 }
 
-                if (jogo.jogo_ganho(estado, palavra)) {
+                if (jogo.jogo_ganho(palavra)) {
                     for (PrintWriter s : saidas) {
                         s.println("Palavra completa! Jogador " + (jogadorAtual + 1) + " ganhou!");
                     }
                     fimDeJogo = true;
                 }
-
                 jogadorAtual++;
+                if(jogadorAtual == 1) espere = 1;
+                else if (jogadorAtual == 2) espere = 2;
+                else espere = 3;
+                  
+                
+                
                 if (jogadorAtual > 2) jogadorAtual = 0;
+                	
             }
 
             // comfirmação de nova rodada
@@ -137,22 +148,26 @@ public class TCPServer {
                         String r = entradas[i].readLine();
 
                         if (r != null && r.equalsIgnoreCase("sim")) {
+                        	
                             confirmou[i] = true;
                             confirmados++;
-                        } else {
+                        } 
+                        
+                        else {
+                        	
                             alguemDisseNao = true;
                             break;
                         }
                     }
                 }
+                
                 if (alguemDisseNao) break;
             }
 
-            if (alguemDisseNao) {
-                encerrarServidor = true;
-            } else {
-                cont++;
-            }
+            if (alguemDisseNao) encerrarServidor = true;
+            
+            else cont++;
+            
         }
 
         for (Socket j : jogadores) j.close();

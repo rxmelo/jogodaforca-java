@@ -5,6 +5,8 @@ public class jogo {
 
 	 //arry para armezenar as respostas
 	  ArrayList<String> resposta = new ArrayList<>();
+	  
+	  String palavra_da_rodada = "";
 	 //metodo para gerar a palavra
 	 public  String palavra () {
 		 
@@ -32,58 +34,70 @@ public class jogo {
 	 // metodo para verificar se o palpite do participante está correto
 	 public  boolean verificar (String palpite, String palavra) {
 		 
-		 int acerto = 0;
-		 
-		 if(palavra.toLowerCase().indexOf(palpite) >= 0) {
-			 
-			 acerto ++;
-			 resposta.add(palpite);
-		 }
-		
-		 if(acerto > 0) return true;
-		 
-		 else return false;
+		 boolean acerto = palavra.toLowerCase().indexOf(palpite) >= 0;
+	     if (acerto) {
+	    	 resposta.add(palpite);
+	     }
+		 return acerto;
 		 
 	 }
-	 // metodo para montar a palavra mediante as respostasanteriores
+	 // metodo para montar a palavra mediante as respostas anteriores
 	 public  String palavra_pos_resposta(String palavra) {
-		 //veriaveis para a construção da palavra
+	
 		 String concluido = "";
+		 palavra_da_rodada = "";
 		 char[] letras = palavra.toCharArray();
-		 boolean verificar = false;
+
 		 // estrutura para verificar e montar a palavra mediante respostas anteriores
 		 for (char indentificacao: letras) {
-			
+			boolean possue = false;
 			 for(int i = 0; i < resposta.size(); i++) {
 				 //variaveis para identificar letras
 				 char [] temp = resposta.get(i).toCharArray();
-				  verificar = false;
-				  
-				 if (temp[0] == indentificacao) {
-					 
-					 verificar = true;
-					 break;
-					 
+								  
+				  if(temp[0] == indentificacao) {
+						 
+					  possue = true;
+						 break;
+						 
+					 }
+
 				 }
+			 
+			 if(possue) {
+				 
+				 concluido+= indentificacao;
+				 palavra_da_rodada += indentificacao;
 				 
 			 }
 			 
-			 if(verificar == true) {
+			 else if (indentificacao == ' ') {
 				 
-				 concluido += indentificacao;
+				 concluido+= " ";
+				 palavra_da_rodada += " ";
 				 
 			 }
 			 
-			 else concluido += " ";
-		 }
-	
+			 else {
+				 
+				 concluido += "_";
+				 
+			 }
+				  
+			 }
+			 
 		 return concluido;
 	 
 	 }
 	 // verificar se ganhou
-	 boolean jogo_ganho(String estado, String palavra) {
+	 boolean jogo_ganho(String palavra) {
 		 
-		 if(estado.equals(palavra)) return true;
+		 if(palavra_da_rodada.equals(palavra)) {
+			 
+			 palavra_da_rodada = "";
+			 return true;
+		 }
+		 
 		 else return false;
 		 
 	 }

@@ -73,14 +73,14 @@ public class jogo {
 			 
 			 else if (indentificacao == ' ') {
 				 
-				 concluido+= " ";
+				 concluido+= "   ";
 				 palavra_da_rodada += " ";
 				 
 			 }
 			 
 			 else {
 				 
-				 concluido += "_";
+				 concluido += "_ ";
 				 
 			 }
 				  

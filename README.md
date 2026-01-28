@@ -65,14 +65,14 @@ O jogo termina quando a palavra é completamente revelada ou quando o número m�
 
 ## Como instalar na máquina (windows)
 
-1.Na tela inicial deste repositório/perfil, clique no botão “<> Code” e depois em “Download ZIP”.
-2.Após a conclusão do download, abra o Explorador de Arquivos e localize o arquivo .zip baixado.
-3.Clique com o botão direito do mouse sobre o arquivo e selecione “Extrair tudo”, escolhendo a pasta onde deseja salvar o projeto.
-4.Abra o Eclipse IDE.
-5.No menu superior, clique em File > Import.
-6.Selecione General > Existing Projects into Workspace e clique em Next.
-7.Em Select root directory, clique em Browse e escolha a pasta onde o projeto foi extraído.
-8.Marque o projeto desejado e clique em Finish para concluir a importação.
+1. Na tela inicial deste repositório/perfil, clique no botão “<> Code” e depois em “Download ZIP”.
+2. Após a conclusão do download, abra o Explorador de Arquivos e localize o arquivo .zip baixado.
+3. Clique com o botão direito do mouse sobre o arquivo e selecione “Extrair tudo”, escolhendo a pasta onde deseja salvar o projeto.
+4. Abra o Eclipse IDE.
+5. No menu superior, clique em File > Import.
+6. Selecione General > Existing Projects into Workspace e clique em Next.
+7. Em Select root directory, clique em Browse e escolha a pasta onde o projeto foi extraído.
+8. Marque o projeto desejado e clique em Finish para concluir a importação.
 
 
 ## Como preparar a máquina para a partida começar
